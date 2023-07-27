@@ -2,57 +2,64 @@
 Basic Linked List Implementation in C
 */
 # include <stdio.h>
-# include <stdbool.h>
 #include <time.h>
 #include <stdlib.h>
+#include "linked_list.h"
 
-//Node Structure
-typedef struct node {
-	int value;
-	struct node* next;
-} node_t;
-
-//Function Declarations
-void addFirst(node_t** head, int nextval);
-void removeFirst(node_t** head);
-void addLast(node_t** head, int nextval);
-void removeLast(node_t* head);
-void sort(node_t* head);
-void print(node_t* head);
-void freeAll(node_t** head);
-bool findMatch(node_t* head, int value);
-
+#if 0
 int main() {
 	//Allocate memory for the head node and set it up
 	node_t* head = NULL;
 
-	//Intialize randomizer
-	srand(time(NULL));
-
-	int i;
-	for (i = 0; i < 10; i++) {
-		addLast(&head, rand() % 20);
-	}
-
-	print(head);
-	printf("\n");
-
-	sort(&head);
+	addSorted(&head, NULL, 1);
+	addSorted(&head, NULL, 3);
+	addSorted(&head, NULL, 8);
+	addSorted(&head, NULL, 2);
+	addSorted(&head, NULL, 2);
+	addSorted(&head, NULL, 9);
+	addSorted(&head, NULL, 10);
+	addSorted(&head, NULL, 25);
 
 	print(head);
 
 	return 0;
 }
+#endif
 
 //Add new node to beginning
-void addFirst(node_t** head, int nextval) {
+void addFirst(node_t** head, void* nextval, unsigned int size) {
 	//Allocate memory for new node and set it up
 	node_t* next = (node_t*)malloc(sizeof(node_t));
-	next->value = nextval;
+	next->ptr = nextval;
+	next->size = size;
 	next->next = *head; //Set the next to point to the current head
 	
 	//Set the new node to be the new head
 	*head = next;
+}
+
+//Add new node in ascending order
+void addSorted(node_t** head, void* nextval, unsigned int size) {
+	//Allocate memory for new node and set it up
+	node_t* next = (node_t*)malloc(sizeof(node_t));
+	next->ptr = nextval;
+	next->size = size;
+
+	if ((*head)==NULL || size < (*head)->size) {
+		next->next = *head;
+		*head = next;
+	}
+	else {
+		node_t* temp = NULL;
+		node_t* head2 = *head;
+		while (head2 != NULL && size > head2->size) {
+			temp = head2;
+			head2 = head2->next;
+		}
+
+		temp->next = next;
+		next->next = head2;
+	}
 }
 
 //Remove first item in list
@@ -66,10 +73,11 @@ void removeFirst(node_t** head) {
 }
 
 //Add a new node to end
-void addLast(node_t** head, int nextval) {
+void addLast(node_t** head, void* nextval, unsigned int size) {
 	//Allocate memory for new node and set it up
 	node_t* next = (node_t*)malloc(sizeof(node_t));
-	next->value = nextval;
+	next->ptr = nextval;
+	next->size = size;
 	next->next = NULL;
 
 	if (*head == NULL) {
@@ -138,7 +146,7 @@ void sort(node_t** head) {
 		//Repeat for all the remaining nodes
 		while (current != NULL) {
 			//If index is greater than current, swap them
-			if (index->value > current->value) {
+			if (index->ptr > current->ptr) {
 				//Handle special case where they are adjacent
 				if (index->next == current) {
 					node_t* temp = index;
@@ -189,15 +197,15 @@ void sort(node_t** head) {
 }	
 
 //Return true if the node exists
-bool findMatch(node_t* head, int value) {
+bool findMatch(node_t* head, void* ptr, unsigned int size) {
 	//Traverse list and check for match
 	while (head->next != NULL) {
-		if (head->value == value) {
+		if (head->ptr == ptr) {
 			return true;
 		}
 		head = head->next;
 	}
-	if (head->value == value) {
+	if (head->ptr == ptr) {
 		return true;
 	}
 	return false;
@@ -205,17 +213,17 @@ bool findMatch(node_t* head, int value) {
 
 //Print out the entire linked list
 void print(node_t* head) {
-	//Traverse list and print out each value
+	//Traverse list and print out each ptr
 	if (head == NULL) {
 		printf("Empty List");
 		return;
 	}
 
 	while (head->next != NULL) {
-		printf("Current node %d", head->value);
+		printf("Current node %d", head->size);
 		printf("\n");
 		head = head->next;
 	}
-	printf("Last node %d", head->value);
+	printf("Last node %d", head->size);
 	printf("\n");
 }
