@@ -45,7 +45,7 @@ void addSorted(node_t** head, void* nextval, unsigned int size) {
 	next->ptr = nextval;
 	next->size = size;
 
-	if ((*head)==NULL || size < (*head)->size) {
+	if ((*head)==NULL || size <= (*head)->size) {
 		next->next = *head;
 		*head = next;
 	}
@@ -128,6 +128,39 @@ void freeAll(node_t** head) {
 	free(*head);
 	*head = NULL;
 	
+}
+
+void delete (node_t* head, node_t* node) {
+	while (head->next != node) {
+		head = head->next;
+	}
+
+	head->next = node->next;
+	free(node);
+}
+
+void delete (node_t* head, void* location) {
+	node_t* temp = head;
+	while (head->ptr != location) {
+		temp = head;
+		head = head->next;
+	}
+
+	temp->next = head->next;
+	free(head);
+}
+
+node_t* smallestLocation(node_t* head, unsigned int size) {
+	//Traverse list and check for match
+	node_t* best = head;
+	while (head != NULL) {
+		if (head->size >= size && head->size < best->size) {
+			best = head;
+		}
+		head = head->next;
+	}
+
+	return best;
 }
 
 void sort(node_t** head) {
