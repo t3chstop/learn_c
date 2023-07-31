@@ -8,6 +8,7 @@
 #if 1
 
 void* allocate(node_t* free, node_t* allocated, unsigned int size);
+void freeLoc(node_t** free, node_t** allocated, void* location);
 
 int main() {
 	//Set up free and allocated linked lists
@@ -18,14 +19,24 @@ int main() {
 
 	addFirst(&free, head, 1024);
 
-	printf("%p\n", allocate(&free, &allocated, 17));
-	printf("%p\n", allocate(&free, &allocated, 12));
-	printf("%p\n", allocate(&free, &allocated, 21));
+	void* alloc1 = allocate(&free, &allocated, 17);
+	void* alloc2 = allocate(&free, &allocated, 21);
+	void* alloc3 = allocate(&free, &allocated, 12);
 
-	//addSorted(&allocated, NULL, 12);
-	//addSorted(&allocated, NULL, 30);
-	//addSorted(&allocated, NULL, 12);
 
+	printf("%p\n", alloc1);
+	printf("%p\n", alloc2);
+	printf("%p\n", alloc3);
+
+	printf("\n");
+	print(free);
+	printf("\n");
+	print(allocated);
+	printf("\n");
+
+	freeLoc(&free, &allocated, alloc2);
+
+	printf("\n");
 	print(free);
 	printf("\n");
 	print(allocated);
@@ -60,9 +71,15 @@ void* allocate(node_t** free, node_t** allocated, unsigned int size) {
 	return location;
 }
 
-void* free(node_t** free, node_t** allocated, void* location) {
-	//Update allocated list
-	delete(allocated, location);
+void freeLoc(node_t** free, node_t** allocated, void* location) {
+	//Get node from allocated list
+	node_t* node = returnNode(*allocated, location);
+
+	//Add to free list
+	addSorted(free, location, node->size);
+
+	//Remove from allocated list
+	delete(*allocated, node);
 
 
 }

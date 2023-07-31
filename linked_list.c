@@ -139,15 +139,11 @@ void delete (node_t* head, node_t* node) {
 	free(node);
 }
 
-void delete (node_t* head, void* location) {
-	node_t* temp = head;
-	while (head->ptr != location) {
-		temp = head;
+node_t* returnNode(node_t* head, void* location) {
+	while (head != NULL && head->ptr != location) {
 		head = head->next;
 	}
-
-	temp->next = head->next;
-	free(head);
+	return head;
 }
 
 node_t* smallestLocation(node_t* head, unsigned int size) {
@@ -253,10 +249,12 @@ void print(node_t* head) {
 	}
 
 	while (head->next != NULL) {
-		printf("Current node %d", head->size);
+		printf("Location %p", head->ptr);
+		printf("; Size %d", head->size);
 		printf("\n");
 		head = head->next;
 	}
-	printf("Last node %d", head->size);
+	printf("Location %p", head->ptr);
+	printf("; Size %d", head->size);
 	printf("\n");
 }
