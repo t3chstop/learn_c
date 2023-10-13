@@ -130,7 +130,13 @@ void freeAll(node_t** head) {
 	
 }
 
-void delete (node_t* head, node_t* node) {
+void delete (node_t* head, node_t** head2, node_t* node) {
+	if (node == head) {
+		*head2 = head->next;
+		free(node);
+		return;
+	}
+
 	while (head->next != node) {
 		head = head->next;
 	}
@@ -154,6 +160,11 @@ node_t* smallestLocation(node_t* head, unsigned int size) {
 			best = head;
 		}
 		head = head->next;
+	}
+
+	if (best->size < size) {
+		printf("No memory available");
+		exit(1);
 	}
 
 	return best;

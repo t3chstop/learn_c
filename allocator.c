@@ -11,37 +11,63 @@ void* allocate(node_t* free, node_t* allocated, unsigned int size);
 void freeLoc(node_t** free, node_t** allocated, void* location);
 
 int main() {
+	//Initialize randomizer
+	srand(time(NULL));
+
 	//Set up free and allocated linked lists
-	node_t* free = NULL;
+	node_t* free = NULL; 
 	node_t* allocated = NULL;
 
-	void* head = malloc(1024);
 
-	addFirst(&free, head, 1024);
+	unsigned int TOTAL_SIZE = 2048;
+	void* head = malloc(TOTAL_SIZE);
+	addFirst(&free, head, TOTAL_SIZE);
 
-	void* alloc1 = allocate(&free, &allocated, 17);
-	void* alloc2 = allocate(&free, &allocated, 21);
-	void* alloc3 = allocate(&free, &allocated, 12);
+	//Make allocations in array
+	void* arr[100];
+	int i;
+	arr[0] = allocate(&free, &allocated, 11);
+	for (i = 1; i < 100; i++) {
+		arr[i] = allocate(&free, &allocated, rand() % 20);
+		printf("%d\n", (char*)arr[i] - arr[i - 1]);
+	}
 
+	//Free half of the locations
+	for (i = 0; i < 50; i++) {
+		freeLoc(&free, &allocated, arr[rand() % 100]);
+	}
 
-	printf("%p\n", alloc1);
-	printf("%p\n", alloc2);
-	printf("%p\n", alloc3);
-
-	printf("\n");
 	print(free);
 	printf("\n");
 	print(allocated);
-	printf("\n");
 
-	freeLoc(&free, &allocated, alloc2);
-
-	printf("\n");
-	print(free);
-	printf("\n");
-	print(allocated);
 
 	return 0;
+
+
+	//void* alloc1 = allocate(&free, &allocated, 17);
+	//void* alloc2 = allocate(&free, &allocated, 21);
+	//void* alloc3 = allocate(&free, &allocated, 12);
+
+
+	//printf("%p\n", alloc1);
+	//printf("%p\n", alloc2);
+	//printf("%p\n", alloc3);
+
+	//printf("\n");
+	//print(free);
+	//printf("\n");
+	//print(allocated);
+	//printf("\n");
+
+	//freeLoc(&free, &allocated, alloc2);
+
+	//printf("\n");
+	//print(free);
+	//printf("\n");
+	//print(allocated);
+
+	//return 0;
 }
 #endif
 
@@ -52,22 +78,15 @@ void* allocate(node_t** free, node_t** allocated, unsigned int size) {
 
 	//Update free list
 	if (locationNode->size - size < 8) {
-		//Delete node
+		//Remove node from free list
 		delete(*free, locationNode);
 	}
 	else {
 		//Edit the node
-		if (size % 8 == 0) {
-			(char*)locationNode->ptr += size;
-			locationNode->size -= size;
-		}
-		else {
-			(char*)locationNode->ptr += size + (8-size%8);
-			locationNode->size -= size + (8 - size % 8);
-		}
+		locationNode->size = ((size+7)/8)*8;
 	}
 
-	addSorted(allocated, location, size);
+	addSorted(allocated, location, size + (8 - size % 8));
 	return location;
 }
 
